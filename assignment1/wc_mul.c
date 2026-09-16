@@ -117,6 +117,7 @@ int main(int argc, char **argv)
     for (int i = 0; i < numJobs; ++i) {
         plist[i].offset = i * child_fsize;
         plist[i].is_complete = 0;
+        plist[i].pid = -1;
     }
 
     int complte_jobs = 0;
@@ -128,10 +129,20 @@ int main(int argc, char **argv)
                 printf("pipe error");
                 exit(1);
             }
-            if (nFork++ > MAX_FORK) return 0;
+            if (nFork++ > MAX_FORK) {
+                printf("Exceeded %d forks\n", MAX_FORK);
+                return 1;
+            }
+            // flush
+            fflush(stdout);
             pid = fork();
             if (pid < 0) {
                 printf("Fork failed.\n");
+                // stops read() 
+                close(plist[i].pipefd[0]);
+                close(plist[i].pipefd[1]);
+                plist[i].pid = -1;
+                continue;
             } else if (pid == 0) {
             // Child
                 close(plist[i].pipefd[0]);
@@ -150,10 +161,8 @@ int main(int argc, char **argv)
                 close(plist[i].pipefd[1]);
             }
         }
-        // check if child process sucessfully done
-        if (pid <= 0) continue;
         for (int i = 0; i < numJobs; ++i) {
-            if (plist[i].is_complete) continue;
+            if (plist[i].is_complete || plist[i].pid < 0) continue;
             count_t cnt;
             i64 x = read(plist[i].pipefd[0], &cnt, sizeof(count_t));
             close(plist[i].pipefd[0]);
