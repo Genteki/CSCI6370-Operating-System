@@ -1,3 +1,6 @@
+// local includes
+#include <unistd.h>
+// template includes
 #include <stdio.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
@@ -23,13 +26,13 @@ void *listener()
 	r = bind(sock, (struct sockaddr *) &sin, sizeof(sin));
 	if(r < 0) {
 		perror("Error binding socket:");
-		return;
+		return NULL;
 	}
 
 	r = listen(sock, 5);
 	if(r < 0) {
 		perror("Error listening socket:");
-		return;
+		return NULL;
 	}
 
 	printf("HTTP server listening on port %d\n", port);
