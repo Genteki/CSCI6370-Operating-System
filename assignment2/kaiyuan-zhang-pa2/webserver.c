@@ -45,7 +45,7 @@ int listener(int port)
 				process(fd);
 		}
 		close(sock);
-
+		return 0;
 }
 
 int main(int argc, char *argv[]) {
