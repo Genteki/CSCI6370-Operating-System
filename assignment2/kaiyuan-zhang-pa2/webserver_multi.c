@@ -83,19 +83,18 @@ void *worker(void* arg) {
 		sem_post(&sem_empty);
 		process(fd);
 	}
-	return NULL;
 }
 
-void thread_control()
-{	
+void thread_control() {	
 	/* ----- */
 	pthread_t tid_listener;
 	pthread_t tid_pool[numThread];
-	int i;
 	pthread_create(&tid_listener, NULL, listener, NULL);
 	for (int i = 0; i < numThread; ++i) {
 		pthread_create(&tid_pool[i], NULL, worker, NULL);
 	}
+	pthread_join(tid_listener, NULL);
+	for (int i = 0; i < numThread; ++i)  pthread_join(tid_pool[i], NULL);
 }
 
 int main(int argc, char *argv[])
