@@ -22,6 +22,7 @@ int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval 
 #define USERAGENT "HTMLGET 1.0"
 
 #define MAX_THREAD 100
+pthread_mutex_t dns_lock = PTHREAD_MUTEX_INITIALIZER;
 
 char *host;
 char *page;
@@ -87,7 +88,9 @@ void *client(void *arg)
 
 	gettimeofday(&tvBegin, NULL);
 	sock = create_tcp_socket();
+	pthread_mutex_lock(&dns_lock);
 	ip = get_ip(host);
+	pthread_mutex_unlock(&dns_lock);
 	//fprintf(stderr, "IP is %s:%d\n", ip, port); 
 	remote = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in *));
 	remote->sin_family = AF_INET;
