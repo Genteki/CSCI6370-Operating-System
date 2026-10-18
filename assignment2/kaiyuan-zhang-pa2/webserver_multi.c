@@ -105,7 +105,6 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	int i;
 	port = atoi(argv[1]);
 	numThread = atoi(argv[2]);
 	rq.head = 0; rq.tail = 0;
